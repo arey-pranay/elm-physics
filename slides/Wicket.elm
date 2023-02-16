@@ -1,4 +1,4 @@
-module TryCircle exposing(..)
+module DiscWick exposing(..)
 import Acceleration
 import Angle
 import Axis3d exposing (Axis3d)
@@ -34,14 +34,17 @@ import Sphere3d
 import Task
 import Viewpoint3d
 
---defining what all can be the IDs
+--defining what all can be the IDs, or the return values
+--BUT WHAT IS AN ID EXACTLY ??
 type Id
     = Mouse
     | Floor
     | Ball
-    | Building
+    | Building1
+    | Building2
+    | Building3
 
-
+--defining the model, the entirity
 type alias Model =
     { world : World Id
     , width : Quantity Float Pixels
@@ -49,7 +52,7 @@ type alias Model =
     , maybeRaycastResult : Maybe (RaycastResult Id)
     }
 
-
+--defining the possible input-output
 type Msg
     = AnimationFrame
     | Resize Int Int
@@ -57,7 +60,7 @@ type Msg
     | MouseMove (Axis3d Meters WorldCoordinates)
     | MouseUp
 
-
+--defining what will be displayed first
 main : Program () Model Msg
 main =
     Browser.element
@@ -67,7 +70,7 @@ main =
         , view = view
         }
 
-
+--inital state of all components
 init : () -> ( Model, Cmd Msg )
 init _ =
     ( { world = initialWorld
@@ -83,6 +86,7 @@ init _ =
     )
 
 
+--What you need to keep looking for
 subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
@@ -90,31 +94,44 @@ subscriptions _ =
         , Browser.Events.onAnimationFrame (\_ -> AnimationFrame)
         ]
 
+--How the world would look initially
 initialWorld : World Id
 initialWorld =
     World.empty
         |> World.withGravity (Acceleration.gees 1) Direction3d.negativeZ
         |> World.add ball
-        |> World.add building
+        |> World.add building1
+        |> World.add building2
+        |> World.add building3
         |> World.add (Body.plane Floor)
 
+--Defining the ball with dimensions
 ballBlock : List (Sphere3d.Sphere3d Meters BodyCoordinates)
 ballBlock =
-    [ Sphere3d.atPoint (Point3d.millimeters -122 172 300)
+    [ Sphere3d.atPoint (Point3d.millimeters 200 -450 400)
         (Length.millimeters 100)
     ]
 
-buildingBlock : List (Block3d Meters BodyCoordinates)
-buildingBlock =
+--Defining the buiding with dimensions
+buildingBlock1 : List (Block3d Meters BodyCoordinates)
+buildingBlock1 =
     [ Block3d.from
-        (Point3d.millimeters -272 -20 0)
-        (Point3d.millimeters -222 30 400)
-    , Block3d.from
-        (Point3d.millimeters -272 222 0)
-        (Point3d.millimeters -222 272 400)
-    , Block3d.from
-        (Point3d.millimeters -272 -272 0)
-        (Point3d.millimeters -222 -222 400)
+        (Point3d.millimeters -272 0 0)
+        (Point3d.millimeters -222 50 400)
+    ]
+
+buildingBlock2 : List (Block3d Meters BodyCoordinates) --rightmost
+buildingBlock2 =
+    [ Block3d.from
+        (Point3d.millimeters -272 150 0)
+        (Point3d.millimeters -222 200 400)
+    ]
+
+buildingBlock3 : List (Block3d Meters BodyCoordinates)
+buildingBlock3 =
+    [ Block3d.from
+        (Point3d.millimeters -272 -150 0)
+        (Point3d.millimeters -222 -100 400)
     ]
     
     -- , Block3d.from
@@ -128,18 +145,28 @@ buildingBlock =
     --     (Point3d.millimeters 275 275 450)
     --]
 
-
+--Something to do with IDs
 ball : Body Id
 ball =
     Body.compound (List.map Physics.Shape.sphere ballBlock) Ball
         |> Body.withBehavior (Body.dynamic (kilograms 3.58))
 
-building : Body Id
-building =
-    Body (List.map Physics.Shape.block buildingBlock) Building
+building1 : Body Id
+building1 =
+    Body.compound (List.map Physics.Shape.block buildingBlock1) Building1
         |> Body.withBehavior (Body.dynamic (kilograms 3.58))
 
+building2 : Body Id
+building2 =
+    Body.compound (List.map Physics.Shape.block buildingBlock2) Building2
+        |> Body.withBehavior (Body.dynamic (kilograms 3.58))
 
+building3 : Body Id
+building3 =
+    Body.compound (List.map Physics.Shape.block buildingBlock3) Building3
+        |> Body.withBehavior (Body.dynamic (kilograms 3.58))
+
+--camera settings, read Camera3d Docs..
 camera : Camera3d Meters WorldCoordinates
 camera =
     Camera3d.perspective
@@ -152,7 +179,7 @@ camera =
         , verticalFieldOfView = Angle.degrees 24
         }
 
-
+--What will be viewed (HTML) 
 view : Model -> Html Msg
 view { world, width, height } =
     Html.div
@@ -163,6 +190,7 @@ view { world, width, height } =
         , Html.Events.on "mousemove" (decodeMouseRay camera width height MouseMove)
         , Html.Events.onMouseUp MouseUp
         ]
+        --Setting the scene up. Scene3d Docs
         [ Scene3d.sunny
             { upDirection = Direction3d.z
             , sunlightDirection = Direction3d.xyZ (Angle.degrees 135) (Angle.degrees -60)
@@ -205,18 +233,39 @@ bodyToEntity body =
                             )
                         )
                     |> Scene3d.group
-            Building ->
-                buildingBlock
+            Building1 ->
+                buildingBlock1
                     |> List.map
                         (Scene3d.blockWithShadow
                             (Material.nonmetal
-                                { baseColor = Color.green
+                                { baseColor = Color.white
                                 , roughness = 0.25
                                 }
                             )
                         )
                     |> Scene3d.group
-
+            Building2 ->
+                buildingBlock2
+                    |> List.map
+                        (Scene3d.blockWithShadow
+                            (Material.nonmetal
+                                { baseColor = Color.white
+                                , roughness = 0.25
+                                }
+                            )
+                        )
+                    |> Scene3d.group
+            Building3 ->
+                buildingBlock3
+                    |> List.map
+                        (Scene3d.blockWithShadow
+                            (Material.nonmetal
+                                { baseColor = Color.white
+                                , roughness = 0.25
+                                }
+                            )
+                        )
+                    |> Scene3d.group
             Floor ->
                 Scene3d.quad (Material.matte Color.darkCharcoal)
                     (Point3d.meters -15 -15 0)
