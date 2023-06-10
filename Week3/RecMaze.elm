@@ -100,8 +100,8 @@ init _ =
     )
 
 
---What you need to keep looking for 
---You analyze the model and return a Sub Msg
+-- What you need to keep looking for 
+-- You analyze the model and return a Sub Msg
 subscriptions : Model -> Sub Msg
 subscriptions _ = --it returns Resize when Browser.Events.onResize is done, and similarly returns AnimationFrame
     Sub.batch
@@ -189,6 +189,132 @@ nw x y =
         (Point3d.millimeters (x+700) (y+500) 400)
     ]
 
+onem x y i = 
+    [ 
+     Block3d.from
+        (Point3d.millimeters x y 0)
+        (Point3d.millimeters (x+i) (y+100) 300)
+      ,
+     Block3d.from
+        (Point3d.millimeters (x+i) (y+100) 0)
+        (Point3d.millimeters (x+i+400) (y+i+200) 300)
+      ,
+      Block3d.from
+        (Point3d.millimeters (x+i+400) (y+i+200) 0)
+        (Point3d.millimeters (x-i-i+400) (y+i+400) 300)
+      ,
+      Block3d.from
+        (Point3d.millimeters (x-i-i+400) (y+i+400) 0)
+        (Point3d.millimeters (x-i-i+400) (y-i-i+600) 300)
+    ]
+
+onem2d x y i = 
+    [ 
+      --m1  
+     Block3d.from
+        (Point3d.millimeters x y 0)
+        (Point3d.millimeters (x+100) (y-i-100) 400)
+      ,
+     Block3d.from
+        (Point3d.millimeters (x+100) (y-i-100) 0)
+        (Point3d.millimeters (x+i+200) (y-i) 400)
+      ,
+      Block3d.from
+        (Point3d.millimeters (x+i+200) (y-i) 0)
+        (Point3d.millimeters (x+i+100) (y+i+100) 400)
+      ,
+      Block3d.from
+        (Point3d.millimeters (x+i+100) (y+i+100) 0)
+        (Point3d.millimeters (x-i) (y+i) 400)
+      ,
+      --m2
+      Block3d.from
+        (Point3d.millimeters (x-i) (y+i) 0)
+        (Point3d.millimeters (x-i+100) (y-(2*i)-100) 400)
+      ,
+      Block3d.from
+        (Point3d.millimeters (x-i+100) (y-(2*i)-100) 0)
+        (Point3d.millimeters (x+(2*i)+200) (y-(2*i)) 400)
+      ,
+      Block3d.from
+        (Point3d.millimeters (x+(2*i)+200) (y-(2*i)) 0)
+        (Point3d.millimeters (x+(2*i)+100) (y+(2*i)+100) 400)
+      ,
+      Block3d.from
+        (Point3d.millimeters (x+(2*i)+100) (y+(2*i)+100) 0)
+        (Point3d.millimeters (x-(2*i)) (y+(2*i)) 400)
+      --m3
+      ,
+      Block3d.from
+        (Point3d.millimeters (x-(2*i)) (y+(2*i)) 0)
+        (Point3d.millimeters (x-(2*i)+100) (y-(3*i)-100) 400)
+      ,
+      Block3d.from
+        (Point3d.millimeters (x-(2*i)+100) (y-(3*i)-100) 0)
+        (Point3d.millimeters (x+(3*i)+200) (y-(3*i)) 400)
+      ,
+      Block3d.from
+        (Point3d.millimeters (x+(3*i)+200) (y-(3*i)) 0)
+        (Point3d.millimeters (x+(3*i)+100) (y+(3*i)+100) 400)
+      ,
+      Block3d.from
+        (Point3d.millimeters (x+(3*i)+100) (y+(3*i)+100) 0)
+        (Point3d.millimeters (x-(3*i)) (y+(3*i) ) 400)
+    --m4
+      ,
+      Block3d.from
+        (Point3d.millimeters (x-(3*i)) (y+(3*i) ) 0)
+        (Point3d.millimeters (x-(3*i)+100) (y-(4*i)-100 ) 400)
+      ,
+      Block3d.from
+        (Point3d.millimeters (x-(3*i)+100) (y-(4*i)-100 ) 0)
+        (Point3d.millimeters (x+(4*i)+200) (y-(4*i) ) 400)
+      ,
+      Block3d.from
+        (Point3d.millimeters (x+(4*i)+200) (y-(4*i) ) 0)
+        (Point3d.millimeters (x+(4*i)+100) (y+(4*i)+100) 400)
+      ,
+      Block3d.from
+        (Point3d.millimeters (x+(4*i)+100) (y+(4*i)+100) 0)
+        (Point3d.millimeters (x-(4*i)) (y+(4*i)) 400)
+    --m5
+      ,
+      Block3d.from
+        (Point3d.millimeters (x-(4*i)) (y+(4*i)) 0)
+        (Point3d.millimeters (x-(4*i)+100) (y-(5*i)-100) 400)
+      ,
+      Block3d.from
+        (Point3d.millimeters (x-(4*i)+100) (y-(5*i)-100) 0)
+        (Point3d.millimeters (x+(5*i)+200) (y-(5*i)) 400)
+      ,
+      Block3d.from
+        (Point3d.millimeters (x+(5*i)+200) (y-(5*i)) 0)
+        (Point3d.millimeters (x+(5*i)+100) (y+(5*i)+100) 400)  
+      ,
+      Block3d.from
+        (Point3d.millimeters (x+(5*i)+100) (y+(5*i)+100) 0)
+        (Point3d.millimeters (x-(5*i)) (y+(5*i)) 400)   
+
+    --m6 
+      ,
+      Block3d.from
+        (Point3d.millimeters (x-(5*i)) (y+(5*i)) 0)
+        (Point3d.millimeters (x-(5*i)+100) (y-(6*i)-100) 400)
+      ,
+      Block3d.from
+        (Point3d.millimeters (x-(5*i)+100) (y-(6*i)-100) 0)
+        (Point3d.millimeters (x+(6*i)+200) (y-(6*i)) 400)
+      ,
+      Block3d.from
+        (Point3d.millimeters (x+(6*i)+200) (y-(6*i)) 0)
+        (Point3d.millimeters (x+(6*i)+100) (y+(6*i)+100) 400)  
+      ,
+      Block3d.from
+        (Point3d.millimeters (x+(6*i)+100) (y+(6*i)+100) 0)
+        (Point3d.millimeters (x-(6*i)) (y+(6*i)) 400)  
+ 
+    ]
+
 nwl x y a b= 
     [ Block3d.from
         (Point3d.millimeters x y 0)
@@ -229,28 +355,157 @@ sel x y a b=
         (Point3d.millimeters (x-((a/2)+100)) (y-(b/2)) 400)
     ]
 
+self x y i= 
+    [ Block3d.from
+        (Point3d.millimeters x y 0)
+        (Point3d.millimeters (x+200) (y-i) 400)
+      ,
+     Block3d.from
+        (Point3d.millimeters (x) (y-i) 0)
+        (Point3d.millimeters (x+200+i) (y-i-200) 400)
+      ,
+      Block3d.from
+        (Point3d.millimeters (x+200+i) (y-i-200) 0)
+        (Point3d.millimeters (x+400+i) (y+i) 400)
+      ,
+      Block3d.from
+        (Point3d.millimeters (x+400+i) (y+i) 0)
+        (Point3d.millimeters (x-i) (y+i+200) 400)
+      ,
+      Block3d.from
+        (Point3d.millimeters (x-i) (y+i+200) 0)
+        (Point3d.millimeters (x-i-200) (y) 400)
+
+    ]
+
+self2 x y i= 
+    [ Block3d.from
+        (Point3d.millimeters x y 0)
+        (Point3d.millimeters (x+200) (y-i-400) 400)
+      ,
+     Block3d.from
+        (Point3d.millimeters (x) (y-i-400) 0)
+        (Point3d.millimeters (x+200+i) (y-i-600) 400)
+      ,
+      Block3d.from
+        (Point3d.millimeters (x+200+i) (y-i-400) 0)
+        (Point3d.millimeters (x+400+i) (y+i+400) 400)
+      ,
+      Block3d.from
+        (Point3d.millimeters (x+200+i) (y+i+200) 0)
+        (Point3d.millimeters (x-i) (y+i+400) 400)
+      ,
+      Block3d.from
+        (Point3d.millimeters (x-i) (y+i+400) 0)
+        (Point3d.millimeters (x-i-200) (y) 400)
+
+    ]
+
+
+
+-- let 
+--     blocky = nw 1500 -1730, center = blocky.center ,dimensions = blocky.dimensions
+-- in
+--     point = Point3d center dimensions
+
+
+-- Calculate the endpoints of a Block3D
+-- blockEndpoints : Block3d -> (Point3d, Point3d)
+-- blockEndpoints block =
+--   let
+--     (x, y, z) = toVec3 (position block)
+--     (width, height, depth) = toVec3 (size block)
+
+--     -- Calculate the endpoints
+--     endpoint1 = Point3d (x - width / 2) (y - height / 2) (z - depth / 2)
+--     endpoint2 = Point3d (x + width / 2) (y + height / 2) (z + depth / 2)
+--   in
+--     (endpoint1, endpoint2)
+
+-- -- Example usage
+-- block : Block3D
+-- block =
+--   Graphics.Collage.block 100 200 300
+
+
+-- let point = Point3d center dimensions
+
+-- funfun (x y i){
+--     if(i == 1000){
+--         break;
+--     }
+--     else{
+--         ltr x y i
+--         |>dtu
+--         |>rtl
+--         |>utd
+--         |>funfun
+--     }
+-- }
+
+-- funfun (0 0 0);
+
+ltr x y i= 
+    Block3d.from
+        (Point3d.millimeters x y 0)
+        (Point3d.millimeters (x+i) y 0)
+--     |>ret1 (x,y,i)
+
+ret1: (Float,Float,Float)->(Float,Float,Float)
+ret1 (x,y,i) = 
+    ((x+i),y,i)
+
+
+
+
+-- dtu x y i= 
+--     Block3d.from
+--         (Point3d.millimeters x y 0)
+--         (Point3d.millimeters x y+i 0)
+    
+--     return (x y+i i+100)
+
+-- rtl x y i= 
+--     Block3d.from
+--         (Point3d.millimeters x y 0)
+--         (Point3d.millimeters x-i y 0)
+    
+--     return (x-i y i)
+
+-- utd x y i= 
+--      Block3d.from
+--         (Point3d.millimeters x y 0)
+--         (Point3d.millimeters x y-i 0)
+    
+--     return(x y-i i+100)
+
 --Defining the ball with dimensions
 ballBlock : List (Sphere3d.Sphere3d Meters BodyCoordinates)
 ballBlock =
-    [ Sphere3d.atPoint (Point3d.millimeters 1900 20 100)
-        (Length.millimeters 150)
+    [ Sphere3d.atPoint (Point3d.millimeters 0 0 0)
+        (Length.millimeters 100)
     ]
 
 --Defining the buiding with dimensions
+
 buildingBlock1 : List (Block3d Meters BodyCoordinates)
-buildingBlock1 = concat[(nel -1200 3600 1000 2500),(nel -200 3600 1000 1000), (sel 2000 3600 1200 2000 ), (sel 2000 1600 2500 2000), (nwl -1200 -4500 3200 4000), (nwl -1200 -1200 2000 4000 ), (sel 2000 0 1500 4300 )]
---concat[(nel -1200 3600 1800 1200),(nwl 340 1990 1000 1200), (swl 2200 -4000 2000 3400 ), (sel 632 707 17000 1388)]
+buildingBlock1 =
+        
+         (onem2d 0 0 500)
 
 
-    -- , Block3d.from
-    --     (Point3d.millimeters 222 -272 0)
-    --     (Point3d.millimeters 272 -222 400)
-    -- , Block3d.from
-    --     (Point3d.millimeters -275 -275 400)
-    --     (Point3d.millimeters 275 275 450)
-    --]
 
---Something to do with IDs
+
+
+
+
+
+        -- let 
+        --     xx = 1500
+        --     yy = -1730
+        -- in
+        -- concat[ (nw xx yy ), (nw (xx+1000) (yy-1000))]
+
 ball : Body Id --
 ball =
     Body.compound (List.map Physics.Shape.sphere ballBlock) Ball
@@ -272,11 +527,11 @@ camera =
     Camera3d.perspective
         { viewpoint =
             Viewpoint3d.lookAt
-                { eyePoint = Point3d.millimeters 900 -980 4000
-                , focalPoint = Point3d.millimeters 1900 20 100
+                { eyePoint = Point3d.millimeters 400 -472 20000
+                , focalPoint = Point3d.millimeters 400 -472 300
                 , upDirection = Direction3d.positiveZ
                 }
-        , verticalFieldOfView = Angle.degrees 10
+        , verticalFieldOfView = Angle.degrees 24
         }
 
 --What will be viewed (HTML) 
@@ -344,17 +599,6 @@ bodyToEntity body =
                             )
                         )
                     |> Scene3d.group
-            -- Building2 ->
-            --     buildingBlock2
-            --         |> List.map
-            --             (Scene3d.blockWithShadow
-            --                 (Material.nonmetal
-            --                     { baseColor = Color.green
-            --                     , roughness = 0.25
-            --                     }
-            --                 )
-            --             )
-            --         |> Scene3d.group
             Floor ->
                 Scene3d.quad (Material.matte Color.darkCharcoal)
                     (Point3d.meters -15 -15 0)
@@ -424,38 +668,6 @@ update msg model =
                         _ ->
                             model
                       
-                        -- Building ->
-                        --     let
-                        --         worldPoint =
-                        --             Point3d.placeIn
-                        --                 (Body.frame raycastResult.body)
-                        --                 raycastResult.point
-
-                        --         mouse =
-                        --             Body.compound [] Mouse
-                        --                 |> Body.moveTo worldPoint
-                        --     in
-                        --     { model
-                        --         | maybeRaycastResult = Just raycastResult
-                        --         , world =
-                        --             model.world
-                        --                 |> World.add mouse
-                        --                 |> World.constrain
-                        --                     (\b1 b2 ->
-                        --                         case ( Body.data b1, Body.data b2 ) of
-                        --                             ( Mouse, Building ) ->
-                        --                                 [ Constraint.pointToPoint
-                        --                                     Point3d.origin
-                        --                                     raycastResult.point
-                        --                                 ]
-
-                        --                             _ ->
-                        --                                 []
-                        --                     )
-                        --     }
-
-                        -- _ ->
-                        --     model
 
                 Nothing ->
                     model

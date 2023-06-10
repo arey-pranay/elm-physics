@@ -1,6 +1,5 @@
 --The program starts with the Module name, The Module name must start with capital
 module TryCircle exposing(..)
-
 --Importing the necessary modules
 import Acceleration
 import Angle
@@ -19,7 +18,6 @@ import Html.Attributes
 import Html.Events
 import Json.Decode exposing (Decoder)
 import Length exposing (Meters, millimeters)
-import List exposing(concat)
 import Mass exposing (kilograms)
 import Physics.Body as Body exposing (Body)
 import Physics.Constraint as Constraint
@@ -81,16 +79,7 @@ init _ =
       , width = pixels 0
       , height = pixels 0
       , maybeRaycastResult = Nothing
-      , camera =
-            Camera3d.perspective
-                 { viewpoint =
-                Viewpoint3d.lookAt
-                { eyePoint = Point3d.millimeters 400 -472 10000
-                , focalPoint = Point3d.millimeters 400 -472 300
-                , upDirection = Direction3d.positiveZ
-                }
-                   , verticalFieldOfView = Angle.degrees 24
-                }
+      , camera = cam1
       }
     , Task.perform
         (\{ viewport } ->
@@ -119,128 +108,109 @@ initialWorld =
         -- |> World.add building2
         |> World.add (Body.plane Floor)
 
-ne x y =
-    [ Block3d.from
-        (Point3d.millimeters x y 0)
-        (Point3d.millimeters (x+1200) (y-200) 400)
-      ,
-      Block3d.from
-        (Point3d.millimeters x y 0)
-        (Point3d.millimeters (x+200) (y-1200) 400)
-      ,
-      Block3d.from
-        (Point3d.millimeters (x+500) y 0)
-        (Point3d.millimeters (x+700) (y-500) 400)
-    ]
---standard block of height 300 (100 to 400) and width 200
---1200,200 --x coordinate y coordinate x length y length
-nel x y a b= 
-    [ Block3d.from
-        (Point3d.millimeters x y 0)
-        (Point3d.millimeters (x+a) (y-200) 400)
-      ,
-     Block3d.from
-        (Point3d.millimeters x y 0)
-        (Point3d.millimeters (x+200) (y-b) 400)
-      ,
-      Block3d.from
-        (Point3d.millimeters (x+((a/2)-100)) y 0)
-        (Point3d.millimeters (x+((a/2)+100)) (y-(b/2)) 400)
-    ]
-sw x y =
-    [ Block3d.from
-        (Point3d.millimeters x y 0)
-        (Point3d.millimeters (x-1200) (y+200) 400)
-      ,
-      Block3d.from
-        (Point3d.millimeters x y 0)
-        (Point3d.millimeters (x-200) (y+1200) 400)
-      ,
-      Block3d.from
-        (Point3d.millimeters (x-500) y 0)
-        (Point3d.millimeters (x-700) (y+500) 400)
-    ]
-
-swl x y a b= 
-    [ Block3d.from
-        (Point3d.millimeters x y 0)
-        (Point3d.millimeters (x-a) (y+200) 400)
-      ,
-     Block3d.from
-        (Point3d.millimeters x y 0)
-        (Point3d.millimeters (x-200) (y+b) 400)
-      ,
-      Block3d.from
-        (Point3d.millimeters (x-((a/2)-100)) y 0)
-        (Point3d.millimeters (x-((a/2)+100)) (y+(b/2)) 400)
-    ]
-
-nw x y =
-    [ Block3d.from
-        (Point3d.millimeters x y 0)
-        (Point3d.millimeters (x+1200) (y+200) 400)
-      ,
-      Block3d.from
-        (Point3d.millimeters x y 0)
-        (Point3d.millimeters (x+200) (y+1200) 400)
-      ,
-      Block3d.from
-        (Point3d.millimeters (x+500) y 0)
-        (Point3d.millimeters (x+700) (y+500) 400)
-    ]
-
-nwl x y a b= 
-    [ Block3d.from
-        (Point3d.millimeters x y 0)
-        (Point3d.millimeters (x+a) (y+200) 400)
-      ,
-     Block3d.from
-        (Point3d.millimeters x y 0)
-        (Point3d.millimeters (x+200) (y+b) 400)
-      ,
-      Block3d.from
-        (Point3d.millimeters (x+((a/2)-100)) y 0)
-        (Point3d.millimeters (x+((a/2)+100)) (y+(b/2)) 400)
-    ]
-se x y =
-    [ Block3d.from
-        (Point3d.millimeters x y 0)
-        (Point3d.millimeters (x-1200) (y-200) 400)
-      ,
-      Block3d.from
-        (Point3d.millimeters x y 0)
-        (Point3d.millimeters (x-200) (y-1200) 400)
-      ,
-      Block3d.from
-        (Point3d.millimeters (x-500) y 0)
-        (Point3d.millimeters (x-700) (y-500) 400)
-    ]
-sel x y a b= 
-    [ Block3d.from
-        (Point3d.millimeters x y 0)
-        (Point3d.millimeters (x-a) (y-200) 400)
-      ,
-     Block3d.from
-        (Point3d.millimeters x y 0)
-        (Point3d.millimeters (x-200) (y-b) 400)
-      ,
-      Block3d.from
-        (Point3d.millimeters (x-((a/2)-100)) y 0)
-        (Point3d.millimeters (x-((a/2)+100)) (y-(b/2)) 400)
-    ]
-
 --Defining the ball with dimensions
 ballBlock : List (Sphere3d.Sphere3d Meters BodyCoordinates)
 ballBlock =
     [ Sphere3d.atPoint (Point3d.millimeters 1900 20 100)
-        (Length.millimeters 150)
+        (Length.millimeters 100)
     ]
 
 --Defining the buiding with dimensions
 buildingBlock1 : List (Block3d Meters BodyCoordinates)
-buildingBlock1 = concat[(nel -1200 3600 1000 2500),(nel -200 3600 1000 1000), (sel 2000 3600 1200 2000 ), (sel 2000 1600 2500 2000), (nwl -1200 -4500 3200 4000), (nwl -1200 -1200 2000 4000 ), (sel 2000 0 1500 4300 )]
---concat[(nel -1200 3600 1800 1200),(nwl 340 1990 1000 1200), (swl 2200 -4000 2000 3400 ), (sel 632 707 17000 1388)]
+buildingBlock1 =
+    --1
+    [ Block3d.from
+        (Point3d.millimeters -1200 3600 100)
+        (Point3d.millimeters -1000 0 400)
 
+    ,--2
+     Block3d.from
+        (Point3d.millimeters -1000 3600 100)
+        (Point3d.millimeters 1400 3400 400)
+    ,--3
+     Block3d.from
+        (Point3d.millimeters -600 3400 100)
+        (Point3d.millimeters -400 2800 400)
+
+        ,--4
+     Block3d.from
+        (Point3d.millimeters -1000 -400 100)
+        (Point3d.millimeters -1200 -1500 400)
+        ,--5
+     Block3d.from
+        (Point3d.millimeters -1000 -1300 100)
+        (Point3d.millimeters 1400 -1500 400)
+        ,--6
+    Block3d.from
+        (Point3d.millimeters 1600 3600 100)
+        (Point3d.millimeters 1400 2800 400)
+        ,
+        --7
+     Block3d.from
+            (Point3d.millimeters -1000 1700 100)
+            (Point3d.millimeters 0 1400 400)   
+
+        ,--8
+     Block3d.from
+           (Point3d.millimeters 900 3400 100)
+           (Point3d.millimeters 1100 2000 400)  
+        ,--9
+     Block3d.from
+        (Point3d.millimeters -1000 -400 0)
+        (Point3d.millimeters -500 -600 400)
+            ,--10
+     Block3d.from
+        (Point3d.millimeters -700 -400 0)
+        (Point3d.millimeters -500 1000 400)
+        ,--11
+    Block3d.from
+        (Point3d.millimeters 1600 2400 100)
+        (Point3d.millimeters 1400 -1500 400)
+        ,--12
+    Block3d.from
+        (Point3d.millimeters 1400 700 100)
+        (Point3d.millimeters 400 500 400)
+
+           ,--13
+    Block3d.from
+        (Point3d.millimeters 600 3000 100)
+        (Point3d.millimeters 400 700 400)
+        ,--14
+                
+    Block3d.from
+        (Point3d.millimeters 400 3000 100)
+        (Point3d.millimeters 0 2800 400)
+               ,--15
+                
+    Block3d.from
+        (Point3d.millimeters -200 1400 100)
+        (Point3d.millimeters 0 -800 400)
+
+                ,--16
+     Block3d.from
+        (Point3d.millimeters 500 -1300 100)
+        (Point3d.millimeters 700 -750 400)
+
+                  ,--17
+     Block3d.from
+        (Point3d.millimeters 300 -1000 100)
+        (Point3d.millimeters 900 -750 400)
+
+            ,--18
+                
+    Block3d.from
+        (Point3d.millimeters 400 2400 100)
+        (Point3d.millimeters -650 2200 400)
+
+                ,--19
+    Block3d.from
+        (Point3d.millimeters 1400 -100 100)
+        (Point3d.millimeters 400 -300 400)
+
+
+    ]
+
+    
 
     -- , Block3d.from
     --     (Point3d.millimeters 222 -272 0)
@@ -267,21 +237,22 @@ building1 =
 --         |> Body.withBehavior (Body.dynamic (kilograms 3.58))
 
 --camera settings, read Camera3d Docs..
-camera : Camera3d Meters WorldCoordinates
-camera =
-    Camera3d.perspective
+cam : Camera3d Meters WorldCoordinates
+cam = cam1
+
+cam1 : Camera3d Meters WorldCoordinates
+cam1 = Camera3d.perspective
         { viewpoint =
             Viewpoint3d.lookAt
-                { eyePoint = Point3d.millimeters 900 -980 4000
-                , focalPoint = Point3d.millimeters 1900 20 100
+                { eyePoint = Point3d.millimeters 400 -472 10000
+                , focalPoint = Point3d.millimeters 400 -472 300
                 , upDirection = Direction3d.positiveZ
                 }
-        , verticalFieldOfView = Angle.degrees 10
+        , verticalFieldOfView = Angle.degrees 24
         }
-
 --What will be viewed (HTML) 
 view : Model -> Html Msg
-view { world, width, height } =
+view { world, width, height, camera } =
     Html.div
         [ Html.Attributes.style "position" "absolute"
         , Html.Attributes.style "left" "0"
@@ -344,17 +315,6 @@ bodyToEntity body =
                             )
                         )
                     |> Scene3d.group
-            -- Building2 ->
-            --     buildingBlock2
-            --         |> List.map
-            --             (Scene3d.blockWithShadow
-            --                 (Material.nonmetal
-            --                     { baseColor = Color.green
-            --                     , roughness = 0.25
-            --                     }
-            --                 )
-            --             )
-            --         |> Scene3d.group
             Floor ->
                 Scene3d.quad (Material.matte Color.darkCharcoal)
                     (Point3d.meters -15 -15 0)
@@ -367,7 +327,9 @@ update : Msg -> Model -> Model
 update msg model =
     case msg of
         AnimationFrame -> --if msg equals AnimationFrame Return the model 
-            { model | world = World.simulate (seconds (1 / 60)) model.world }
+            { model | world = World.simulate (seconds (1 / 60)) model.world 
+            --extract the position of camera from world and put it here
+            }
             
 
         Resize width height -> --if msg equals Resize
@@ -392,17 +354,19 @@ update msg model =
                                         |> Body.moveTo worldPoint
                             in
                             { model
-                                | maybeRaycastResult = Just raycastResult
-                                , camera =
+
+                              | camera =
                                          Camera3d.perspective
                                              { viewpoint =
                                                  Viewpoint3d.lookAt
-                                                     { eyePoint = worldPoint
-                                                     , focalPoint = Point3d.millimeters 0 0 0
+                                                     { eyePoint = Point3d.millimeters 900 -980 4000
+                                                     , focalPoint = worldPoint
                                                      , upDirection = Direction3d.positiveZ
                                                      }
                                              , verticalFieldOfView = Angle.degrees 24
                                             }
+
+                                , maybeRaycastResult = Just raycastResult        
                                 , world =
                                     model.world
                                         |> World.add mouse
@@ -423,39 +387,6 @@ update msg model =
 
                         _ ->
                             model
-                      
-                        -- Building ->
-                        --     let
-                        --         worldPoint =
-                        --             Point3d.placeIn
-                        --                 (Body.frame raycastResult.body)
-                        --                 raycastResult.point
-
-                        --         mouse =
-                        --             Body.compound [] Mouse
-                        --                 |> Body.moveTo worldPoint
-                        --     in
-                        --     { model
-                        --         | maybeRaycastResult = Just raycastResult
-                        --         , world =
-                        --             model.world
-                        --                 |> World.add mouse
-                        --                 |> World.constrain
-                        --                     (\b1 b2 ->
-                        --                         case ( Body.data b1, Body.data b2 ) of
-                        --                             ( Mouse, Building ) ->
-                        --                                 [ Constraint.pointToPoint
-                        --                                     Point3d.origin
-                        --                                     raycastResult.point
-                        --                                 ]
-
-                        --                             _ ->
-                        --                                 []
-                        --                     )
-                        --     }
-
-                        -- _ ->
-                        --     model
 
                 Nothing ->
                     model
@@ -472,11 +403,22 @@ update msg model =
                         plane =
                             Plane3d.through
                                 worldPoint
-                                (Viewpoint3d.viewDirection (Camera3d.viewpoint camera))
+                                (Viewpoint3d.viewDirection (Camera3d.viewpoint model.camera))
                     in
                     { model
 
-                        | world =
+                        | camera =
+                                         Camera3d.perspective
+                                             { viewpoint =
+                                                 Viewpoint3d.lookAt
+                                                     { focalPoint = worldPoint
+                                                      ,eyePoint = Point3d.millimeters 900 -980 4000
+                                                      ,upDirection = Direction3d.positiveZ
+                                                     }
+                                             , verticalFieldOfView = Angle.degrees 24
+                                            }
+
+                        , world =
                             World.update
                                 (\body ->
                                     if Body.data body == Mouse then
@@ -491,16 +433,6 @@ update msg model =
                                         body
                                 )
                                 model.world
-                            , camera =
-                                         Camera3d.perspective
-                                             { viewpoint =
-                                                 Viewpoint3d.lookAt
-                                                     { eyePoint = worldPoint
-                                                     , focalPoint = Point3d.millimeters 400 -472 300
-                                                     , upDirection = Direction3d.positiveZ
-                                                     }
-                                             , verticalFieldOfView = Angle.degrees 24
-                                            }
                     }
 
                 Nothing ->
@@ -509,10 +441,21 @@ update msg model =
         MouseUp ->
             { model
                 | maybeRaycastResult = Nothing
+                -- , camera =
+                --                          Camera3d.perspective
+                --                              { viewpoint =
+                --                                  Viewpoint3d.lookAt
+                --                                      { eyePoint = Point3d.millimeters 900 -980 4000
+                --                                      , focalPoint = Point3d.millimeters 1900 20 100
+                --                                      , upDirection = Direction3d.positiveZ
+                --                                      }
+                --                              , verticalFieldOfView = Angle.degrees 24
+                --                             }
                 , world =
                     World.keepIf
                         (\body -> Body.data body /= Mouse)
                         model.world
+                 
             }
 
 

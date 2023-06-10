@@ -232,7 +232,7 @@ sel x y a b=
 --Defining the ball with dimensions
 ballBlock : List (Sphere3d.Sphere3d Meters BodyCoordinates)
 ballBlock =
-    [ Sphere3d.atPoint (Point3d.millimeters 1900 20 100)
+    [ Sphere3d.atPoint (Point3d.millimeters -800 -4000 100)
         (Length.millimeters 150)
     ]
 
@@ -272,11 +272,11 @@ camera =
     Camera3d.perspective
         { viewpoint =
             Viewpoint3d.lookAt
-                { eyePoint = Point3d.millimeters 900 -980 4000
-                , focalPoint = Point3d.millimeters 1900 20 100
+                { eyePoint = Point3d.millimeters 400 -472 10000
+                , focalPoint = Point3d.millimeters 400 -472 300
                 , upDirection = Direction3d.positiveZ
                 }
-        , verticalFieldOfView = Angle.degrees 10
+        , verticalFieldOfView = Angle.degrees 24
         }
 
 --What will be viewed (HTML) 

@@ -14,6 +14,7 @@ import Camera3d exposing (Camera3d)
 import Color
 import Direction3d
 import Duration exposing (seconds)
+import Frame3d exposing(..)
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events
@@ -45,7 +46,7 @@ type Id
     | Floor --To create a surface to place the Ball and Buildings
     | Ball --To assign to the ball
     | Building1 --To assign to the building, although I think we can replace Building2 by Building1
-    -- | Building2
+    | Obstacle (Block3d Meters BodyCoordinates)
 
 --defining the model, the entirity.. 
 type alias Model =
@@ -116,7 +117,7 @@ initialWorld =
         |> World.withGravity (Acceleration.gees 1) Direction3d.negativeZ
         |> World.add ball
         |> World.add building1
-        -- |> World.add building2
+        |> World.add slope
         |> World.add (Body.plane Floor)
 
 ne x y =
@@ -232,7 +233,7 @@ sel x y a b=
 --Defining the ball with dimensions
 ballBlock : List (Sphere3d.Sphere3d Meters BodyCoordinates)
 ballBlock =
-    [ Sphere3d.atPoint (Point3d.millimeters 1900 20 100)
+    [ Sphere3d.atPoint (Point3d.millimeters -800 -4000 100)
         (Length.millimeters 150)
     ]
 
@@ -251,6 +252,25 @@ buildingBlock1 = concat[(nel -1200 3600 1000 2500),(nel -200 3600 1000 1000), (s
     --]
 
 --Something to do with IDs
+
+slope : Body Id
+slope =
+    let
+        slopeBlock = 
+            Block3d.centeredOn Frame3d.atOrigin
+                ( Length.meters 1
+                , Length.meters 2
+                , Length.meters 0.1
+                )
+
+    in
+    
+        Body.block slopeBlock (Obstacle slopeBlock)
+            |> Body.rotateAround Axis3d.x (Angle.degrees 35)
+            -- |> Body.rotateAround Axis3d.y (Angle.degrees 120)
+            |> Body.moveTo (Point3d.millimeters -450 -2000 0)
+
+
 ball : Body Id --
 ball =
     Body.compound (List.map Physics.Shape.sphere ballBlock) Ball
@@ -272,11 +292,11 @@ camera =
     Camera3d.perspective
         { viewpoint =
             Viewpoint3d.lookAt
-                { eyePoint = Point3d.millimeters 900 -980 4000
-                , focalPoint = Point3d.millimeters 1900 20 100
+                { eyePoint = Point3d.millimeters 400 -472 10000
+                , focalPoint = Point3d.millimeters 400 -472 1300
                 , upDirection = Direction3d.positiveZ
                 }
-        , verticalFieldOfView = Angle.degrees 10
+        , verticalFieldOfView = Angle.degrees 24
         }
 
 --What will be viewed (HTML) 
@@ -333,6 +353,15 @@ bodyToEntity body =
                             )
                         )
                     |> Scene3d.group
+
+            Obstacle hehe ->
+                Scene3d.blockWithShadow
+                (Material.nonmetal
+                  { baseColor = Color.blue
+                  , roughness = 1
+                  }
+                )
+              hehe
             Building1 ->
                 buildingBlock1
                     |> List.map

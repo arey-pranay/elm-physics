@@ -1,5 +1,5 @@
 --The program starts with the Module name, The Module name must start with capital
-module TryCircle exposing(..)
+module MaeFol exposing(..)
 
 --Importing the necessary modules
 import Acceleration
@@ -14,6 +14,7 @@ import Camera3d exposing (Camera3d)
 import Color
 import Direction3d
 import Duration exposing (seconds)
+import Frame3d exposing(..)
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events
@@ -45,7 +46,7 @@ type Id
     | Floor --To create a surface to place the Ball and Buildings
     | Ball --To assign to the ball
     | Building1 --To assign to the building, although I think we can replace Building2 by Building1
-    -- | Building2
+    | Obstacle (Block3d Meters BodyCoordinates)
 
 --defining the model, the entirity.. 
 type alias Model =
@@ -116,7 +117,7 @@ initialWorld =
         |> World.withGravity (Acceleration.gees 1) Direction3d.negativeZ
         |> World.add ball
         |> World.add building1
-        -- |> World.add building2
+        |> World.add slope
         |> World.add (Body.plane Floor)
 
 ne x y =
@@ -232,25 +233,54 @@ sel x y a b=
 --Defining the ball with dimensions
 ballBlock : List (Sphere3d.Sphere3d Meters BodyCoordinates)
 ballBlock =
-    [ Sphere3d.atPoint (Point3d.millimeters 1900 20 100)
+    [ Sphere3d.atPoint (Point3d.millimeters 0 -2500 100)
         (Length.millimeters 150)
     ]
 
 --Defining the buiding with dimensions
 buildingBlock1 : List (Block3d Meters BodyCoordinates)
-buildingBlock1 = concat[(nel -1200 3600 1000 2500),(nel -200 3600 1000 1000), (sel 2000 3600 1200 2000 ), (sel 2000 1600 2500 2000), (nwl -1200 -4500 3200 4000), (nwl -1200 -1200 2000 4000 ), (sel 2000 0 1500 4300 )]
+buildingBlock1 = [
+    Block3d.from
+        (Point3d.millimeters 1000 2000 1000)
+        (Point3d.millimeters -1000 500 1100),
+    Block3d.from
+        (Point3d.millimeters 1000 -2000 0)
+        (Point3d.millimeters -1000 -3000 100),
+        Block3d.from
+        (Point3d.millimeters 1000 2000 1100)
+        (Point3d.millimeters -1000 2100 4000)
+    
+    ]
+--concat[(nel -1200 3600 1000 2500),(nel -200 3600 1000 1000), (sel 2000 3600 1200 2000 ), (sel 2000 1600 2500 2000), (nwl -1200 -4500 3200 4000), (nwl -1200 -1200 2000 4000 ), (sel 2000 0 1500 4300 ), (sel 2000 300 2000 5000)]
 --concat[(nel -1200 3600 1800 1200),(nwl 340 1990 1000 1200), (swl 2200 -4000 2000 3400 ), (sel 632 707 17000 1388)]
 
 
-    -- , Block3d.from
-    --     (Point3d.millimeters 222 -272 0)
-    --     (Point3d.millimeters 272 -222 400)
+
     -- , Block3d.from
     --     (Point3d.millimeters -275 -275 400)
     --     (Point3d.millimeters 275 275 450)
     --]
 
 --Something to do with IDs
+
+slope : Body Id
+slope =
+    let
+        slopeBlock = 
+            Block3d.centeredOn Frame3d.atOrigin
+                ( Length.millimeters 2000
+                , Length.millimeters 2000
+                , Length.millimeters 100
+                )
+
+    in
+    
+        Body.block slopeBlock (Obstacle slopeBlock)
+            |> Body.rotateAround Axis3d.x (Angle.degrees 35)
+            -- |> Body.rotateAround Axis3d.y (Angle.degrees 120)
+            |> Body.moveTo (Point3d.millimeters 10 -2000 0)
+
+
 ball : Body Id --
 ball =
     Body.compound (List.map Physics.Shape.sphere ballBlock) Ball
@@ -272,11 +302,11 @@ camera =
     Camera3d.perspective
         { viewpoint =
             Viewpoint3d.lookAt
-                { eyePoint = Point3d.millimeters 900 -980 4000
-                , focalPoint = Point3d.millimeters 1900 20 100
+                { eyePoint = Point3d.millimeters 0 200 10000
+                , focalPoint = Point3d.millimeters 0 200 1300
                 , upDirection = Direction3d.positiveZ
                 }
-        , verticalFieldOfView = Angle.degrees 10
+        , verticalFieldOfView = Angle.degrees 24
         }
 
 --What will be viewed (HTML) 
@@ -333,6 +363,15 @@ bodyToEntity body =
                             )
                         )
                     |> Scene3d.group
+
+            Obstacle hehe ->
+                Scene3d.blockWithShadow
+                (Material.nonmetal
+                  { baseColor = Color.blue
+                  , roughness = 1
+                  }
+                )
+              hehe
             Building1 ->
                 buildingBlock1
                     |> List.map
